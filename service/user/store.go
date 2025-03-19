@@ -21,7 +21,7 @@ func NewStore(db *sql.DB) *Store {
 
 // GetUserByEmail fetches a user by email
 func (s *Store) GetUserByEmail(email string) (*types.User, error) {
-	row := s.db.QueryRow("SELECT id, first_name, last_name, email, password, created_at FROM users WHERE email = ?", email)
+	row := s.db.QueryRow("SELECT id, firstName, lastName, email, password, createdAt FROM users WHERE email = ?", email)
 
 	u := new(types.User)
 	err := row.Scan(&u.ID, &u.FirstName, &u.LastName, &u.Email, &u.Password, &u.CreatedAt)
@@ -37,7 +37,7 @@ func (s *Store) GetUserByEmail(email string) (*types.User, error) {
 // CreateUser for save to database
 func (s *Store) CreateUser(user *types.User) error {
 	// SQL query to insert user data
-	query := `INSERT INTO users (firtName, lastName, email, password, createdAt) VALUES(?, ?, ?, ?, ?)`
+	query := `INSERT INTO users (firstName, lastName, email, password, createdAt) VALUES(?, ?, ?, ?, ?)`
 
 	// Execute the query and insert the user
 	_, err := s.db.Exec(query, user.FirstName, user.LastName, user.Email, user.Password, user.CreatedAt)
@@ -46,4 +46,19 @@ func (s *Store) CreateUser(user *types.User) error {
 	}
 
 	return nil
+}
+
+// GetUserById fetches a user by id
+func (s *Store) GetUserById(id int) (*types.User, error) {
+	row := s.db.QueryRow("SELECT id, firstName, lastName, email, password, createdAt FROM users where id = ? ", id)
+
+	u := new(types.User)
+	err := row.Scan(&u.ID, &u.FirstName, &u.LastName, &u.Email, &u.Password, &u.CreatedAt)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, fmt.Errorf("user not found")
+		}
+		return nil, err
+	}
+	return u, nil
 }
