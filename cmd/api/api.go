@@ -10,14 +10,18 @@ import (
 )
 
 type APIServer struct {
-	addr string
-	db   *sql.DB
+	addr  string
+	db    *sql.DB
+	store *user.Store //Store for interacting with the database
 }
 
 func NewAPIserver(addr string, db *sql.DB) *APIServer {
+
+	store := user.NewStore(db)
 	return &APIServer{
-		addr: addr,
-		db:   db,
+		addr:  addr,
+		db:    db,
+		store: store,
 	}
 }
 
@@ -28,7 +32,7 @@ func (s *APIServer) Run() error {
 	subrouter := router.PathPrefix("/api/v1").Subrouter()
 
 	// user handler
-	userHandler := user.NewHandler()
+	userHandler := user.NewHandler(s.store)
 	userHandler.RegisterRouter(subrouter)
 
 	//  login and server listen
