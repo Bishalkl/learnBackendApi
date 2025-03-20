@@ -24,4 +24,11 @@ type RegisterUserPayload struct {
 	LastName  string `json: "lastName"`
 	Email     string `json: "email"`
 	Password  string `json: "password"`
+	Token     string `json: "_token, omitempty"`
+}
+
+// types LoginUserPayload struct
+type LoginUserPayload struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
 }

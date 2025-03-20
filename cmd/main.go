@@ -11,8 +11,9 @@ import (
 )
 
 func main() {
+
 	// connecting server with database
-	db, err := db.NewMySQLStorage(mysql.Config{
+	dbConnection, err := db.NewMySQLStorage(mysql.Config{
 		User:                 config.Envs.DBUser,
 		Passwd:               config.Envs.DBPassword,
 		Addr:                 config.Envs.DBAddress,
@@ -22,25 +23,29 @@ func main() {
 		ParseTime:            true,
 	})
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("Failed to connect to database: ", err)
 	}
 
-	// check and connect the database
-	initStorage(db)
+	defer dbConnection.Close() //Make sure the DB connection is closed
 
-	// creating server for apis
-	server := api.NewAPIserver(":8080", db)
+	// Check the DB connection
+	if err := initStorage(dbConnection); err != nil {
+		log.Fatal("Error initializing database: ", err)
+	}
+
+	// create an start the server
+	server := api.NewAPIserver(":8080", dbConnection)
 	if err := server.Run(); err != nil {
-		log.Fatal(err)
+		log.Fatal("Error running server: ", err)
 	}
 
 }
 
-// func to check
-func initStorage(db *sql.DB) {
-	err := db.Ping()
-	if err != nil {
-		log.Fatal(err)
+// initStorage checks the database connection and ensure it's reachable
+func initStorage(db *sql.DB) error {
+	if err := db.Ping(); err != nil {
+		return err
 	}
 	log.Println("DB: Successfully connected")
+	return nil
 }
