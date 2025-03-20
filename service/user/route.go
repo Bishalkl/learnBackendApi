@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/bishalkl/learnBackendApi/auth"
+	"github.com/bishalkl/learnBackendApi/service/auth"
 	"github.com/bishalkl/learnBackendApi/types"
 	"github.com/bishalkl/learnBackendApi/utils"
 	"github.com/gorilla/mux"
