@@ -29,22 +29,53 @@ func (h *Handler) RegisterRouter(router *mux.Router) {
 
 // handler for login
 func (h *Handler) handleLogin(w http.ResponseWriter, r *http.Request) {
-	// for login we should have first store in local variable
+	// Parse the login payload
+	var payload types.LoginUserPayload
+	if err := utils.ParseJSON(r, &payload); err != nil {
+		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("Invalid request payload"))
+		return
+	}
+
+	// Check if the user exists
+	existingUser, err := h.store.GetUserByEmail(payload.Email)
+	if err != nil {
+		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("Invalid email or password"))
+		return
+	}
+
+	// Check if the provided password is correct
+	if !auth.ComparePassword(existingUser.Password, payload.Password) {
+		utils.WriteError(w, http.StatusUnauthorized, fmt.Errorf("Invalid credentials"))
+		return
+	}
+
+	// Generate JWT token (assuming you have functin for this)
+	token, err := auth.GenerateJWT(existingUser.Email)
+	if err != nil {
+		utils.WriteError(w, http.StatusInternalServerError, fmt.Errorf("Faild to generate token"))
+		return
+	}
+
+	// Send success response with JWT token
+	utils.WriteJSON(w, http.StatusOK, map[string]string{
+		"message": "Login successful",
+		"token":   token,
+	})
 
 }
 
 // handler for register
 func (h *Handler) handleRegister(w http.ResponseWriter, r *http.Request) {
-	// getJSON payload
+	// GetJSON payload
 	var payload types.RegisterUserPayload
 	if err := utils.ParseJSON(r, &payload); err != nil {
-		utils.WriteError(w, http.StatusBadRequest, err)
+		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("Invalid request payload"))
 		return
 	}
 
 	// check if the user exists
-	existingUser, err := h.store.GetUserByEmail(payload.Email)
-	if err == nil && existingUser != nil {
+	_, err := h.store.GetUserByEmail(payload.Email)
+	if err == nil {
 		utils.WriteError(w, http.StatusConflict, fmt.Errorf("User already exists"))
 		return
 	}
@@ -52,7 +83,7 @@ func (h *Handler) handleRegister(w http.ResponseWriter, r *http.Request) {
 	// Hash password
 	hashPassword, err := auth.HashPassword(payload.Password)
 	if err != nil {
-		utils.WriteError(w, http.StatusInternalServerError, err)
+		utils.WriteError(w, http.StatusInternalServerError, fmt.Errorf("Failed to hash password"))
 		return
 	}
 
@@ -68,7 +99,7 @@ func (h *Handler) handleRegister(w http.ResponseWriter, r *http.Request) {
 	// Save user in DB
 	err = h.store.CreateUser(newUser)
 	if err != nil {
-		utils.WriteError(w, http.StatusInternalServerError, err)
+		utils.WriteError(w, http.StatusInternalServerError, fmt.Errorf("Failed to create user"))
 		return
 	}
 

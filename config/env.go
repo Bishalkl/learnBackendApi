@@ -3,7 +3,6 @@ package config
 import (
 	"fmt"
 	"os"
-	"strconv"
 
 	"github.com/joho/godotenv"
 )
@@ -16,7 +15,8 @@ type Config struct {
 	DBPassword string
 	DBAddress  string
 	DBName     string
-	JWT_SECRET int32
+	JWT_SECRET string
+	JWTIssure  string
 }
 
 // makeing global variable
@@ -26,7 +26,7 @@ var Envs = initconfig()
 func initconfig() *Config {
 
 	// directly load in to env
-	godotenv.Load()
+	_ = godotenv.Load()
 	return &Config{
 		PublicHost: getEnv("PUBLIC_HOST", "http://localhost"),
 		Port:       getEnv("PORT", ":8080"),
@@ -34,7 +34,8 @@ func initconfig() *Config {
 		DBPassword: getEnv("DB_PASSWORD", "root"),
 		DBAddress:  fmt.Sprintf("%s:%s", getEnv("DB_HOST", "127.0.0.1"), getEnv("DB_PORT", "3306")),
 		DBName:     getEnv("DB_NAME", "testDb"),
-		JWT_SECRET: getINtEnv("JWT_SECRET", 256),
+		JWT_SECRET: getEnv("JWT_SECRET", "default"),
+		JWTIssure:  getEnv("JWT_ISSUER", "http://localhost:8080"),
 	}
 }
 
@@ -46,21 +47,15 @@ func getEnv(key, fallback string) string {
 	return fallback
 }
 
-// func for getIntEnv
-func getINtEnv(key string, fallback int32) int32 {
-	if value, ok := os.LookupEnv(key); ok {
-		// convert string value to int32
-		parsedValue, err := strconv.Atoi(value)
-		if err != nil {
-			return fallback
-		}
-		return int32(parsedValue)
-	}
-	return fallback
-}
-
-// INitializing global enviroment variable
-
-func init() {
-	Envs = initconfig()
-}
+// // func for getIntEnv
+// func getIntEnv(key string, fallback int32) int32 {
+// 	if value, ok := os.LookupEnv(key); ok {
+// 		// convert string value to int32
+// 		parsedValue, err := strconv.Atoi(value)
+// 		if err != nil {
+// 			return fallback
+// 		}
+// 		return int32(parsedValue)
+// 	}
+// 	return fallback
+// }
