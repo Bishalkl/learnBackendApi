@@ -30,7 +30,9 @@ func (s *APIServer) Run() error {
 
 	// let's create router now
 	router := mux.NewRouter()
+	// for public router
 	publirouter := router.PathPrefix("/api/v1").Subrouter()
+	// for protectedrouter
 	protectedrouter := router.PathPrefix("/protected/api/v1").Subrouter()
 
 	// user handler
@@ -39,6 +41,8 @@ func (s *APIServer) Run() error {
 
 	// Apply middleware to the subrouter (the route under /api/v1)
 	publirouter.Use(auth.LoggingMiddleware)
+
+	// Apply middleware to the subrouter(the router under /protected/api/v1)
 	protectedrouter.Use(auth.JWTMiddleware, auth.LoggingMiddleware)
 
 	//  login and server listen

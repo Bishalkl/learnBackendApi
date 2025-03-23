@@ -42,7 +42,7 @@ func (s *Store) CreateUser(user *types.User) error {
 	if user.CreatedAt.IsZero() {
 		user.CreatedAt = time.Now()
 	}
-	
+
 	// SQL query to insert user data
 	query := `INSERT INTO users (firstName, lastName, email, password, createdAt) VALUES(?, ?, ?, ?, ?)`
 
