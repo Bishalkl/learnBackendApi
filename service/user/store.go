@@ -3,6 +3,7 @@ package user
 import (
 	"database/sql"
 	"fmt"
+	"time"
 
 	"github.com/bishalkl/learnBackendApi/types"
 )
@@ -36,6 +37,12 @@ func (s *Store) GetUserByEmail(email string) (*types.User, error) {
 
 // CreateUser for save to database
 func (s *Store) CreateUser(user *types.User) error {
+
+	// Set createdAt to current time if not already set
+	if user.CreatedAt.IsZero() {
+		user.CreatedAt = time.Now()
+	}
+	
 	// SQL query to insert user data
 	query := `INSERT INTO users (firstName, lastName, email, password, createdAt) VALUES(?, ?, ?, ?, ?)`
 
