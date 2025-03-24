@@ -12,18 +12,21 @@ import (
 )
 
 type APIServer struct {
-	addr  string
-	db    *sql.DB
-	store *user.Store //Store for interacting with the database
+	addr         string
+	db           *sql.DB
+	userstore    *user.Store    //Store for interacting with the database
+	productstore *product.Store //Store for interacting with the database
 }
 
 func NewAPIserver(addr string, db *sql.DB) *APIServer {
 
-	store := user.NewStore(db)
+	userstore := user.NewStore(db)
+	productstore := product.NewStore(db)
 	return &APIServer{
-		addr:  addr,
-		db:    db,
-		store: store,
+		addr:         addr,
+		db:           db,
+		userstore:    userstore,
+		productstore: productstore,
 	}
 }
 
@@ -37,11 +40,11 @@ func (s *APIServer) Run() error {
 	protectedrouter := router.PathPrefix("/protected/api/v1").Subrouter()
 
 	// user handler
-	userHandler := user.NewHandler(s.store)
+	userHandler := user.NewHandler(s.userstore)
 	userHandler.RegisterRouter(publirouter)
 
 	// Product handler
-	productHanlder := product.NewHanlder()
+	productHanlder := product.NewHandler(s.productstore)
 	productHanlder.RegisterRouter(publirouter)
 
 	// Apply middleware to the subrouter (the route under /api/v1)

@@ -11,8 +11,9 @@ type UserStore interface {
 }
 
 type ProductStore interface {
-	GetProducts() ([]Product, error)
-	GetProductById(UserID int) (Product, error)
+	GetProducts() (*[]Product, error)
+	GetProductById(UserID int) (*Product, error)
+	CreateProduct(product *Product) error
 }
 
 // types for Product

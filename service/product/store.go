@@ -2,6 +2,7 @@ package product
 
 import (
 	"database/sql"
+	"fmt"
 
 	"github.com/bishalkl/learnBackendApi/types"
 )
@@ -28,6 +29,7 @@ func (s *Store) GetProducts() ([]types.Product, error) {
 	if err != nil {
 		return nil, err //Return an error if the query fails
 	}
+	defer rows.Close() // Ensure rows are closed after function execution
 
 	var products []types.Product
 
@@ -84,5 +86,19 @@ func (s *Store) GetProductById(id int) (types.Product, error) {
 		}
 		return types.Product{}, err //Return an error for other issues
 	}
-	return types.Product{}, nil //Return the found product
+	return product, nil //Return the found product
+}
+
+// CreateProduct inserts a new product into the database
+func (s *Store) CreateProduct(product *types.Product) error {
+	// SQL query to insert a new product
+	query := "INSERT INTO products (name, description, image, price, quantity, createdAt) VALUES (?, ?, ?, ?, ?)"
+
+	// Execute the query
+	_, err := s.db.Query(query, product.Name, product.Description, product.Image, product.Price, product.Quantity, product.CreatedAt)
+	if err != nil {
+		return fmt.Errorf("faild to insert product: %v", err)
+	}
+
+	return nil
 }
