@@ -47,7 +47,7 @@ func JWTMiddleware(next http.Handler) http.Handler {
 
 		// Add user email to request context for use in other handlers
 		ctx := r.Context() // Create a new context to store the user information
-		ctx = context.WithValue(ctx, "user-email", claims.Email)
+		ctx = context.WithValue(ctx, "user-email", claims.ID)
 		r = r.WithContext(ctx)
 
 		// Call the next handler

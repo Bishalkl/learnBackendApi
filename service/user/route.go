@@ -50,7 +50,7 @@ func (h *Handler) handleLogin(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Generate JWT token (assuming you have functin for this)
-	token, err := auth.GenerateJWT(existingUser.Email)
+	token, err := auth.GenerateJWT(existingUser.ID)
 	if err != nil {
 		utils.WriteError(w, http.StatusInternalServerError, fmt.Errorf("Faild to generate token"))
 		return

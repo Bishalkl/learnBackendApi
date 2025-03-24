@@ -18,13 +18,13 @@ type Claims struct {
 }
 
 // GenerateJWT generates a new JWT token for the given email
-func GenerateJWT(id int) (string, error) {
+func GenerateJWT(Userid int) (string, error) {
 	// Token expires in 24 hours
 	expirationTime := time.Now().Add(24 * time.Hour)
 
 	// calmiing
 	claims := &Claims{
-		ID: id,
+		ID: Userid,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(expirationTime),
 			Issuer:    config.Envs.JWTIssure,
