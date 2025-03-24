@@ -13,17 +13,18 @@ var mySigningKey = []byte(config.Envs.JWT_SECRET)
 
 // Claims defines the structure of the JWT claims
 type Claims struct {
-	Email string `json:"email"`
+	ID int `json:"id"`
 	jwt.RegisteredClaims
 }
 
 // GenerateJWT generates a new JWT token for the given email
-func GenerateJWT(email string) (string, error) {
+func GenerateJWT(id int) (string, error) {
 	// Token expires in 24 hours
 	expirationTime := time.Now().Add(24 * time.Hour)
 
+	// calmiing
 	claims := &Claims{
-		Email: email,
+		ID: id,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(expirationTime),
 			Issuer:    config.Envs.JWTIssure,
