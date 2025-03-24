@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/bishalkl/learnBackendApi/service/auth"
+	"github.com/bishalkl/learnBackendApi/service/product"
 	"github.com/bishalkl/learnBackendApi/service/user"
 	"github.com/gorilla/mux"
 )
@@ -38,6 +39,10 @@ func (s *APIServer) Run() error {
 	// user handler
 	userHandler := user.NewHandler(s.store)
 	userHandler.RegisterRouter(publirouter)
+
+	// Product handler
+	productHanlder := product.NewHanlder()
+	productHanlder.RegisterRouter(publirouter)
 
 	// Apply middleware to the subrouter (the route under /api/v1)
 	publirouter.Use(auth.LoggingMiddleware)
