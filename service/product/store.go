@@ -61,7 +61,7 @@ func (s *Store) GetProducts() ([]types.Product, error) {
 }
 
 // function for get Product by id
-func (s *Store) GetProductById(id int) (types.Product, error) {
+func (s *Store) GetProductById(id int) (*types.Product, error) {
 	// SQL query to fetch a product by ID
 	query := "SELECT id ,name ,description, image, price, quantity, createdAt FROM products WHERE id = ?"
 
@@ -82,17 +82,17 @@ func (s *Store) GetProductById(id int) (types.Product, error) {
 	)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return types.Product{}, nil //Return an empty product if not found
+			return nil, nil //Return an empty product if not found
 		}
-		return types.Product{}, err //Return an error for other issues
+		return nil, err //Return an error for other issues
 	}
-	return product, nil //Return the found product
+	return &product, nil //Return the found product
 }
 
 // CreateProduct inserts a new product into the database
 func (s *Store) CreateProduct(product *types.Product) error {
 	// SQL query to insert a new product
-	query := "INSERT INTO products (name, description, image, price, quantity, createdAt) VALUES (?, ?, ?, ?, ?)"
+	query := "INSERT INTO products (name, description, image, price, quantity, createdAt) VALUES (?, ?, ?, ?, ?, ?)"
 
 	// Execute the query
 	_, err := s.db.Query(query, product.Name, product.Description, product.Image, product.Price, product.Quantity, product.CreatedAt)

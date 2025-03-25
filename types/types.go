@@ -11,8 +11,8 @@ type UserStore interface {
 }
 
 type ProductStore interface {
-	GetProducts() (*[]Product, error)
-	GetProductById(UserID int) (*Product, error)
+	GetProducts() ([]Product, error)
+	GetProductById(id int) (*Product, error)
 	CreateProduct(product *Product) error
 }
 
@@ -32,7 +32,7 @@ type User struct {
 	FirstName string    `json:"firstName"`
 	LastName  string    `json:"lastName"`
 	Email     string    `json:"email"`
-	Password  string    `json:"-"`
+	Password  string    `json:"password, omitempty"`
 	CreatedAt time.Time `json:"createdAt"`
 }
 

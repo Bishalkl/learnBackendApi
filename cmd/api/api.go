@@ -35,20 +35,20 @@ func (s *APIServer) Run() error {
 	// let's create router now
 	router := mux.NewRouter()
 	// for public router
-	publirouter := router.PathPrefix("/api/v1").Subrouter()
+	publicrouter := router.PathPrefix("/api/v1").Subrouter()
 	// for protectedrouter
 	protectedrouter := router.PathPrefix("/protected/api/v1").Subrouter()
 
 	// user handler
 	userHandler := user.NewHandler(s.userstore)
-	userHandler.RegisterRouter(publirouter)
+	userHandler.RegisterRouter(publicrouter)
 
 	// Product handler
-	productHanlder := product.NewHandler(s.productstore)
-	productHanlder.RegisterRouter(publirouter)
+	productHandler := product.NewHandler(s.productstore)
+	productHandler.RegisterRouter(publicrouter)
 
 	// Apply middleware to the subrouter (the route under /api/v1)
-	publirouter.Use(auth.LoggingMiddleware)
+	publicrouter.Use(auth.LoggingMiddleware)
 
 	// Apply middleware to the subrouter(the router under /protected/api/v1)
 	protectedrouter.Use(auth.JWTMiddleware, auth.LoggingMiddleware)
