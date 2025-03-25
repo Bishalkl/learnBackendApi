@@ -1,8 +1,9 @@
 package product
 
 import (
-	"fmt"
+	"errors"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/bishalkl/learnBackendApi/types"
@@ -25,7 +26,7 @@ func NewHandler(store types.ProductStore) *Handler {
 // for register router
 func (h *Handler) RegisterRouter(router *mux.Router) {
 	router.HandleFunc("/product", h.createProductHandler).Methods(http.MethodPost)
-	router.HandleFunc("/product", h.GetProductsHandler).Methods(http.MethodGet)
+	router.HandleFunc("/products", h.GetProductsHandler).Methods(http.MethodGet)
 	router.HandleFunc("/product/{id}", h.GetProductHandler).Methods(http.MethodGet)
 }
 
@@ -51,12 +52,37 @@ func (h *Handler) createProductHandler(w http.ResponseWriter, r *http.Request) {
 	utils.WriteJSON(w, http.StatusCreated, map[string]string{"message": "Product created successfully"})
 }
 
-// hanlder for getProduct
+// hanlder for getProducts
 func (h *Handler) GetProductsHandler(w http.ResponseWriter, r *http.Request) {
+	products, err := h.store.GetProducts()
+	if err != nil {
+		utils.WriteError(w, http.StatusInternalServerError, err)
+		return
+	}
 
+	// Respond with products
+	utils.WriteJSON(w, http.StatusOK, products)
 }
 
-// hanlder for getProduct
+// handler for getProduct
 func (h *Handler) GetProductHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Hello,this is getProduct page")
+	vars := mux.Vars(r)
+	id, err := strconv.Atoi(vars["id"]) // Conver string to int
+	if err != nil {
+		utils.WriteError(w, http.StatusBadRequest, err)
+		return
+	}
+
+	product, err := h.store.GetProductById(id)
+	if err != nil {
+		utils.WriteError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	if product == nil {
+		utils.WriteError(w, http.StatusNotFound, errors.New("Product not found"))
+	}
+
+	utils.WriteJSON(w, http.StatusOK, product)
+
 }
