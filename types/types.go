@@ -2,6 +2,8 @@ package types
 
 import (
 	"time"
+
+	"github.com/go-playground/validator/v10"
 )
 
 type UserStore interface {
@@ -16,23 +18,31 @@ type ProductStore interface {
 	CreateProduct(product *Product) error
 }
 
+// for validate
+var validate *validator.Validate
+
+func init() {
+	validate = validator.New()
+}
+
 // types for Product
 type Product struct {
 	ID          int       `json:"id"`
-	Name        string    `json:"name"`
-	Description string    `json:"description"`
-	Image       string    `json:"image"`
-	Price       float64   `json:"price"`
-	Quantity    int       `json:"quantity"`
+	Name        string    `json:"name" validate:"required, min=3, max=100"`
+	Description string    `json:"description" validate:"required, min=10, max=255"`
+	Image       string    `json:"image" validate:"required, url"`
+	Price       float64   `json:"price" validate:"required, gt=0"`
+	Quantity    int       `json:"quantity" validate:"required, gt=0"`
 	CreatedAt   time.Time `json:"createdAt"`
 }
 
+// User struct
 type User struct {
 	ID        int       `json:"id"`
-	FirstName string    `json:"firstName"`
-	LastName  string    `json:"lastName"`
-	Email     string    `json:"email"`
-	Password  string    `json:"password,omitempty"`
+	FirstName string    `json:"firstName" validate:"required,min=3,max=100"`
+	LastName  string    `json:"lastName" validate:"required,min=3,max=100"`
+	Email     string    `json:"email" validate:"required,email"`
+	Password  string    `json:"password,omitempty" validate:"required,min=6"`
 	CreatedAt time.Time `json:"createdAt"`
 }
 
