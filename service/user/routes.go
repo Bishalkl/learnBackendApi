@@ -36,6 +36,12 @@ func (h *Handler) handleLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Validate login payload
+	if err := payload.Validate(); err != nil {
+		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("Validation failed: %v", err))
+		return
+	}
+
 	// Check if the user exists
 	existingUser, err := h.store.GetUserByEmail(payload.Email)
 	if err != nil {
@@ -70,6 +76,12 @@ func (h *Handler) handleRegister(w http.ResponseWriter, r *http.Request) {
 	var payload types.RegisterUserPayload
 	if err := utils.ParseJSON(r, &payload); err != nil {
 		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("Invalid request payload"))
+		return
+	}
+
+	// Validate register payload
+	if err := payload.Validate(); err != nil {
+		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("Validation failed: %v", err))
 		return
 	}
 
